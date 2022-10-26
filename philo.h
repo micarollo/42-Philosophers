@@ -33,10 +33,15 @@ typedef struct	s_data
 	int	time_to_die;
 	int	time_to_eat;
 	int	time_to_sleep;
-	//int	time_must_eat;
+	int	time_must_eat;
 	t_philo	*philo;
 	long long	time;
 	long	short_time;
 }		t_data;
+
+int	init_data(char **argv, t_data *data);
+void	create_philos(t_data *data);
+long long get_time(void);
+long	get_short_time(t_data *data);
 
 #endif

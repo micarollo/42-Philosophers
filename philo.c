@@ -29,20 +29,32 @@ long	get_short_time(t_data *data)
 	return (time - data->time);
 }
 
-void	check_arguments(char *argv, t_data *data, int i)
+int	init_data(char **argv, t_data *data)
 {
-	int num;
-
-	num = atoi(argv);
-	if (i == 1 && num < INT_MAX)
-		data->n_philo = num;
-	if (i == 2 && num < INT_MAX)
-		data->time_to_die = num;
-	if (i == 3 && num < INT_MAX)
-		data->time_to_eat = num;
-	if (i == 4 && num < INT_MAX)
-		data->time_to_sleep = num;
+	data->n_philo = atoi(argv[1]);
+	data->time_to_die = atoi(argv[2]);
+	data->time_to_eat = atoi(argv[3]);
+	data->time_to_sleep = atoi(argv[4]);
+	if (argv[5])
+		data->time_must_eat = atoi(argv[5]);
+	create_philos(data);
+	return (0);
 }
+
+// void	check_arguments(char *argv, t_data *data, int i)
+// {
+// 	int num;
+
+// 	num = atoi(argv);
+// 	if (i == 1 && num < INT_MAX)
+// 		data->n_philo = num;
+// 	if (i == 2 && num < INT_MAX)
+// 		data->time_to_die = num;
+// 	if (i == 3 && num < INT_MAX)
+// 		data->time_to_eat = num;
+// 	if (i == 4 && num < INT_MAX)
+// 		data->time_to_sleep = num;
+// }
 
 void	create_philos(t_data *data)
 {
@@ -78,22 +90,23 @@ int main(int argc, char *argv[])
 	int i;
 
 	data = malloc(sizeof(t_data));
-	if (argc >= 5)
-	{
-		i = 1;
-		while (i < argc)
-		{
-			check_arguments(argv[i], data, i);
-			i++;
-		}
-		printf("n_philo %d\n", data->n_philo);
-		printf("time_to_die %d\n", data->time_to_die);
-		printf("time_to_eat %d\n", data->time_to_eat);
-		printf("time_to_sleep %d\n", data->time_to_sleep);
-	}
-	else
-		printf("Argument missing\n");
-	create_philos(data);
+	init_data(argv, data);
+	// if (argc >= 5)
+	// {
+	// 	i = 1;
+	// 	while (i < argc)
+	// 	{
+	// 		check_arguments(argv[i], data, i);
+	// 		i++;
+	// 	}
+	// 	printf("n_philo %d\n", data->n_philo);
+	// 	printf("time_to_die %d\n", data->time_to_die);
+	// 	printf("time_to_eat %d\n", data->time_to_eat);
+	// 	printf("time_to_sleep %d\n", data->time_to_sleep);
+	// }
+	// else
+	// 	printf("Argument missing\n");
+	// create_philos(data);
 	data->time = get_time();
 	usleep(5000);
 	data->short_time = get_short_time(data);
