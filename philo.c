@@ -38,6 +38,24 @@ int	init_data(char **argv, t_data *data)
 	if (argv[5])
 		data->time_must_eat = atoi(argv[5]);
 	create_philos(data);
+	init_mutex(data);
+	return (0);
+}
+
+int	init_mutex(t_data *data)
+{
+	int i;
+
+	i = 0;
+	data->forks = malloc(sizeof(pthread_mutex_t) * data->n_philo);
+	if (!data->forks)
+		return (1);
+	while (i < data->n_philo)
+	{
+		if (pthread_mutex_init(&(data->forks[i]), NULL))
+			return (1);
+		i++;
+	}
 	return (0);
 }
 
@@ -61,6 +79,8 @@ void	create_philos(t_data *data)
 	int i;
 
 	data->philo = malloc(sizeof(t_philo) * data->n_philo);
+	if (!data->philo)
+		return ;
 	i = 0;
 	while (i <= data->n_philo)
 	{
@@ -87,29 +107,36 @@ void	create_philos(t_data *data)
 int main(int argc, char *argv[])
 {
 	t_data	*data;
-	int i;
+	//int i;
 
-	data = malloc(sizeof(t_data));
-	init_data(argv, data);
-	// if (argc >= 5)
-	// {
-	// 	i = 1;
-	// 	while (i < argc)
-	// 	{
-	// 		check_arguments(argv[i], data, i);
-	// 		i++;
-	// 	}
-	// 	printf("n_philo %d\n", data->n_philo);
-	// 	printf("time_to_die %d\n", data->time_to_die);
-	// 	printf("time_to_eat %d\n", data->time_to_eat);
-	// 	printf("time_to_sleep %d\n", data->time_to_sleep);
-	// }
-	// else
-	// 	printf("Argument missing\n");
-	// create_philos(data);
-	data->time = get_time();
-	usleep(5000);
-	data->short_time = get_short_time(data);
-	printf("time: %lld\n", data->time);
-	printf("short_time: %ld\n", data->short_time);
+	if (argc < 5)
+		write(2, "Argument missing\n", 17);
+	else
+	{
+		data = malloc(sizeof(t_data));
+		if (!data)
+			return (1);
+		init_data(argv, data);
+		// if (argc >= 5)
+		// {
+		// 	i = 1;
+		// 	while (i < argc)
+		// 	{
+		// 		check_arguments(argv[i], data, i);
+		// 		i++;
+		// 	}
+		// 	printf("n_philo %d\n", data->n_philo);
+		// 	printf("time_to_die %d\n", data->time_to_die);
+		// 	printf("time_to_eat %d\n", data->time_to_eat);
+		// 	printf("time_to_sleep %d\n", data->time_to_sleep);
+		// }
+		// else
+		// 	printf("Argument missing\n");
+		// create_philos(data);
+		data->time = get_time();
+		usleep(5000);
+		data->short_time = get_short_time(data);
+		printf("time: %lld\n", data->time);
+		printf("short_time: %ld\n", data->short_time);
+	}
 }
