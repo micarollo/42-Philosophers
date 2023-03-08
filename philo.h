@@ -25,6 +25,7 @@ typedef struct s_philo
 	int last_eat;
 	int fork_left;
 	int fork_right;
+	_Bool	is_dead;
 }		t_philo;
 
 typedef struct	s_data

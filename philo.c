@@ -29,19 +29,6 @@ long	get_short_time(t_data *data)
 	return (time - data->time);
 }
 
-int	init_data(char **argv, t_data *data)
-{
-	data->n_philo = atoi(argv[1]);
-	data->time_to_die = atoi(argv[2]);
-	data->time_to_eat = atoi(argv[3]);
-	data->time_to_sleep = atoi(argv[4]);
-	if (argv[5])
-		data->time_must_eat = atoi(argv[5]);
-	create_philos(data);
-	init_mutex(data);
-	return (0);
-}
-
 int	init_mutex(t_data *data)
 {
 	int i;
@@ -59,21 +46,6 @@ int	init_mutex(t_data *data)
 	return (0);
 }
 
-// void	check_arguments(char *argv, t_data *data, int i)
-// {
-// 	int num;
-
-// 	num = atoi(argv);
-// 	if (i == 1 && num < INT_MAX)
-// 		data->n_philo = num;
-// 	if (i == 2 && num < INT_MAX)
-// 		data->time_to_die = num;
-// 	if (i == 3 && num < INT_MAX)
-// 		data->time_to_eat = num;
-// 	if (i == 4 && num < INT_MAX)
-// 		data->time_to_sleep = num;
-// }
-
 void	create_philos(t_data *data)
 {
 	int i;
@@ -87,27 +59,41 @@ void	create_philos(t_data *data)
 		data->philo[i].n = i + 1; //desde el 1 en adelante
 		data->philo[i].born_time = get_time();
 		data->philo[i].last_eat = 0;
-		data->philo[i].fork_left = i;
-		data->philo[i].fork_right = i - 1;
+		data->philo[i].fork_left = i + 1;
+		data->philo[i].fork_right = i;
+		data->philo[i].is_dead = 0;
 		i++;
 	}
-	data->philo[0].fork_right = data->n_philo - 1;
+	data->philo[i - 1].fork_left = 0;
+	
 	//PRINT PHILOS
 	i = 0;
 	while (i <= data->n_philo)
 	{
 		printf("philo[%d] num: %d\n", i, data->philo[i].n);
 		//printf("data->philo[%d].born_time %d\n", i, data->philo[i].born_time);
-		printf("philo[%d] fork_left: %i\n", i, data->philo[i].fork_left);
 		printf("philo[%d] fork_right: %d\n", i, data->philo[i].fork_right);
+		printf("philo[%d] fork_left: %i\n", i, data->philo[i].fork_left);
 		i++;
 	}
+}
+
+int	init_data(char **argv, t_data *data)
+{
+	data->n_philo = atoi(argv[1]);
+	data->time_to_die = atoi(argv[2]);
+	data->time_to_eat = atoi(argv[3]);
+	data->time_to_sleep = atoi(argv[4]);
+	if (argv[5])
+		data->time_must_eat = atoi(argv[5]);
+	create_philos(data);
+	init_mutex(data);
+	return (0);
 }
 
 int main(int argc, char *argv[])
 {
 	t_data	*data;
-	//int i;
 
 	if (argc < 5)
 		write(2, "Argument missing\n", 17);
@@ -117,22 +103,8 @@ int main(int argc, char *argv[])
 		if (!data)
 			return (1);
 		init_data(argv, data);
-		// if (argc >= 5)
-		// {
-		// 	i = 1;
-		// 	while (i < argc)
-		// 	{
-		// 		check_arguments(argv[i], data, i);
-		// 		i++;
-		// 	}
-		// 	printf("n_philo %d\n", data->n_philo);
-		// 	printf("time_to_die %d\n", data->time_to_die);
-		// 	printf("time_to_eat %d\n", data->time_to_eat);
-		// 	printf("time_to_sleep %d\n", data->time_to_sleep);
-		// }
-		// else
-		// 	printf("Argument missing\n");
-		// create_philos(data);
+		
+		//PRUEBAS
 		data->time = get_time();
 		usleep(5000);
 		data->short_time = get_short_time(data);
