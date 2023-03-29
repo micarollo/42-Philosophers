@@ -25,7 +25,9 @@ typedef struct s_philo
 	int last_eat;
 	int fork_left;
 	int fork_right;
-	_Bool	is_dead;
+	int	n_eats;
+	// _Bool	is_dead;
+	struct s_data *data;
 }		t_philo;
 
 typedef struct	s_data
@@ -36,9 +38,11 @@ typedef struct	s_data
 	int	time_to_sleep;
 	int	time_must_eat;
 	pthread_mutex_t	*forks;
-	t_philo	*philo;
+	pthread_mutex_t write;
 	long long	time;
 	long	short_time;
+	int	are_alive;
+	t_philo	*philo;
 }		t_data;
 
 int			init_data(char **argv, t_data *data);
@@ -46,5 +50,6 @@ void		create_philos(t_data *data);
 long long 	get_time(void);
 long		get_short_time(t_data *data);
 int			init_mutex(t_data *data);
+int			game(t_data *data);
 
 #endif
