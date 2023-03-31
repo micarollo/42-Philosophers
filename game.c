@@ -23,6 +23,8 @@ void	*play(void *arg)
 	philo = arg;
 	write(1, "s\n", 2);
 	printf("philo: %d\n", philo->n);
+	if (philo->n % 2)
+		usleep(1500);
 	while (1)
 	{
 		write(1, "t\n", 2);
