@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrollo <mrollo@student.42barcelon...>      +#+  +:+       +#+        */
+/*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 14:28:45 by mrollo            #+#    #+#             */
-/*   Updated: 2022/09/21 18:53:20 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/03 20:10:08 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,6 @@ long long get_time(void)
 
 	gettimeofday(&time, NULL);
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
-}
-
-long	get_short_time(t_data *data)
-{
-	long long	time;
-
-	time = get_time();
-	// printf("now: %lld\n", time);
-	return (time - data->time);
 }
 
 int	init_mutex(t_data *data)
@@ -59,37 +50,38 @@ void	create_philos(t_data *data)
 	{
 		data->philo[i].n = i + 1; //desde el 1 en adelante
 		data->philo[i].born_time = get_time();
-		data->philo[i].last_eat = 0;
+		data->philo[i].last_eat = get_time();
 		data->philo[i].fork_left = i + 1;
 		data->philo[i].fork_right = i;
-		// data->philo[i].is_dead = 0;
+		data->philo[i].data = data;
 		i++;
 	}
 	data->philo[i - 1].fork_left = 0;
-	
-	//PRINT PHILOS
-	// i = 0;
-	// while (i <= data->n_philo)
-	// {
-	// 	printf("philo[%d] num: %d\n", i, data->philo[i].n);
-	// 	printf("data->philo[%d].born_time %d\n", i, data->philo[i].born_time);
-	// 	printf("philo[%d] fork_right: %d\n", i, data->philo[i].fork_right);
-	// 	printf("philo[%d] fork_left: %i\n", i, data->philo[i].fork_left);
-	// 	i++;
-	// }
+}
+
+int	check_arg(char *str)
+{
+	while (*str)
+	{
+		if (*str < 48 || *str > 59)
+			return (1);
+		str++;
+	}
+	return (0);
 }
 
 int	init_data(char **argv, t_data *data)
 {
+	if (check_arg(argv[1]) || check_arg(argv[2]) || check_arg(argv[3]) || check_arg(argv[4]))
+		return (1);
 	data->n_philo = atoi(argv[1]);
 	data->time_to_die = atoi(argv[2]);
 	data->time_to_eat = atoi(argv[3]);
 	data->time_to_sleep = atoi(argv[4]);
 	data->are_alive = 1;
+	data->time = get_time();
 	if (argv[5])
-		data->time_must_eat = atoi(argv[5]);
-	create_philos(data);
-	init_mutex(data);
+		data->meals = atoi(argv[5]);
 	return (0);
 }
 
@@ -104,15 +96,14 @@ int main(int argc, char *argv[])
 		data = malloc(sizeof(t_data));
 		if (!data)
 			return (1);
-		init_data(argv, data);
-
-		//PRUEBAS
-		// data->time = get_time();
-		// usleep(5000);
-		// data->short_time = get_short_time(data);
-		// printf("time: %lld\n", data->time);
-		// printf("short_time: %ld\n", data->short_time);
-
+		if (init_data(argv, data))
+		{
+			printf("argument error\n");
+			return (1);
+		}
+		init_mutex(data);	
+		create_philos(data);
 		game(data);
 	}
+	return (0);
 }

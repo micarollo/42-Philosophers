@@ -1,18 +1,33 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   game.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/03 18:25:07 by mrollo            #+#    #+#             */
+/*   Updated: 2023/04/03 19:59:56 by mrollo           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 void	print_action(t_philo *philo, int n)
 {
 	pthread_mutex_lock(&philo->data->write);
-	if (n == 0)
-		printf("%d is thinking\n", philo->n);
-	if (n == 1)
-		printf("%d has taken a fork\n", philo->n);
-	if (n == 2)
-		printf("%d is eating\n", philo->n);
-	if (n == 3)
-		printf("%d is sleeping\n", philo->n);
-	if (n == 4)
-		printf("%d is dead\n", philo->n);
+	if (philo->data->are_alive)
+	{
+		if (n == 0)
+			printf("[%lld] %d is thinking\n", (get_time() - philo->data->time), philo->n);
+		if (n == 1)
+			printf("[%lld] %d has taken a fork\n", (get_time() - philo->data->time), philo->n);
+		if (n == 2)
+			printf("[%lld] %d is eating\n", (get_time() - philo->data->time), philo->n);
+		if (n == 3)
+			printf("[%lld] %d is sleeping\n", (get_time() - philo->data->time), philo->n);
+		if (n == 4)
+			printf("[%lld] %d is dead\n", (get_time() - philo->data->time), philo->n);
+	}
 	pthread_mutex_unlock(&philo->data->write);
 }
 
@@ -21,46 +36,52 @@ void	*play(void *arg)
 	t_philo	*philo;
 
 	philo = arg;
-	write(1, "s\n", 2);
-	printf("philo: %d\n", philo->n);
-	if (philo->n % 2)
+	if (philo->n % 2 == 0)
 		usleep(1500);
-	while (1)
+	while (philo->data->are_alive)
 	{
-		write(1, "t\n", 2);
-		// print_action(philo, 0);
-		// pthread_mutex_lock(&philo->data->forks[philo->fork_left]);
-		// print_action(philo, 1);
-		// pthread_mutex_lock(&philo->data->forks[philo->fork_right]);
-		// print_action(philo, 1);
-		// print_action(philo, 2);
-		// philo->n_eats++;
-		// philo->last_eat = get_short_time(philo->data);
-		// pthread_mutex_unlock(&philo->data->forks[philo->fork_left]);
-		// pthread_mutex_unlock(&philo->data->forks[philo->fork_right]);
-		// print_action(philo, 3);
+		thinking(philo);
+		eating(philo);
+		sleeping(philo);
 	}
 	return (NULL);
+}
+
+int	meals_check(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while(data->meals && i < data->n_philo)
+	{
+		if (data->philo[i].n_eats == data->meals)
+			i++;
+		else
+			return (1);
+	}
+	return (0);
 }
 
 int	is_anybody_dead(t_data *data)
 {
 	int	i;
 
-	i = 0;
 	while (data->are_alive)
 	{
+		i = 0;
 		while (i < data->n_philo)
 		{
-			// if (data->philo[i].is_dead == 1)
-			if ((get_short_time(data) - data->philo[i].last_eat) > data->time_to_eat)
+			if (((get_time() - data->time) - data->philo[i].last_eat ) > data->time_to_die)
 			{
+				print_action(&data->philo[i], 4);
 				data->are_alive = 0;
 				usleep(50);
 				return (1);
 			}
 			i++;
 		}
+		// if (!meals_check(data))
+		// 	break ;
 	}
 	return (0);
 }
@@ -76,7 +97,6 @@ int	game(t_data *data)
 	i = 0;
 	while (i < data->n_philo)
 	{
-		write(1, "r\n", 2);
 		if (pthread_create(&phi[i], NULL, play, &data->philo[i]))
 			printf("error\n");
 		i++;
