@@ -6,19 +6,12 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 14:28:45 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/03 20:10:08 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/04 17:58:17 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-long long get_time(void)
-{
-	struct timeval time;
-
-	gettimeofday(&time, NULL);
-	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
-}
+#include <string.h>
 
 int	init_mutex(t_data *data)
 {
@@ -35,6 +28,7 @@ int	init_mutex(t_data *data)
 		i++;
 	}
 	pthread_mutex_init(&data->write, NULL);
+	pthread_mutex_init(&data->death, NULL);
 	return (0);
 }
 
@@ -46,9 +40,9 @@ void	create_philos(t_data *data)
 	if (!data->philo)
 		return ;
 	i = 0;
-	while (i <= data->n_philo)
+	while (i < data->n_philo)
 	{
-		data->philo[i].n = i + 1; //desde el 1 en adelante
+		data->philo[i].n = i + 1;
 		data->philo[i].born_time = get_time();
 		data->philo[i].last_eat = get_time();
 		data->philo[i].fork_left = i + 1;
@@ -61,6 +55,9 @@ void	create_philos(t_data *data)
 
 int	check_arg(char *str)
 {
+	// cambiar x ft_strcmp
+	// if (strcmp(str, "0") == 0)
+	// 	return (1);
 	while (*str)
 	{
 		if (*str < 48 || *str > 59)
@@ -74,14 +71,22 @@ int	init_data(char **argv, t_data *data)
 {
 	if (check_arg(argv[1]) || check_arg(argv[2]) || check_arg(argv[3]) || check_arg(argv[4]))
 		return (1);
-	data->n_philo = atoi(argv[1]);
-	data->time_to_die = atoi(argv[2]);
-	data->time_to_eat = atoi(argv[3]);
-	data->time_to_sleep = atoi(argv[4]);
+	data->n_philo = ft_atoi(argv[1]);
+	data->time_to_die = ft_atoi(argv[2]);
+	data->time_to_eat = ft_atoi(argv[3]);
+	data->time_to_sleep = ft_atoi(argv[4]);
+	if (data->n_philo <= 0 || data->time_to_die <= 0 || data->time_to_eat <= 0 || data->time_to_sleep <= 0)
+		return (1);
 	data->are_alive = 1;
+	data->full = 0;
 	data->time = get_time();
-	if (argv[5])
-		data->meals = atoi(argv[5]);
+	data->meals = 0;
+	if (argv[5] && !check_arg(argv[5]))
+	{
+		data->meals = ft_atoi(argv[5]);
+		if (data->meals <= 0)
+			return (1);
+	}
 	return (0);
 }
 
@@ -90,7 +95,7 @@ int main(int argc, char *argv[])
 	t_data	*data;
 
 	if (argc < 5)
-		write(2, "Argument missing\n", 17);
+		printf("Argument missing\n");
 	else
 	{
 		data = malloc(sizeof(t_data));
@@ -99,11 +104,14 @@ int main(int argc, char *argv[])
 		if (init_data(argv, data))
 		{
 			printf("argument error\n");
+			free (data);
 			return (1);
 		}
 		init_mutex(data);	
 		create_philos(data);
 		game(data);
+		ft_clean(data);
 	}
+	system("leaks a.out");
 	return (0);
 }

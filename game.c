@@ -6,7 +6,7 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 18:25:07 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/03 19:59:56 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/04 18:06:48 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	print_action(t_philo *philo, int n)
 {
 	pthread_mutex_lock(&philo->data->write);
-	if (philo->data->are_alive)
+	if (philo->data->are_alive && !philo->data->full)
 	{
 		if (n == 0)
 			printf("[%lld] %d is thinking\n", (get_time() - philo->data->time), philo->n);
@@ -38,50 +38,50 @@ void	*play(void *arg)
 	philo = arg;
 	if (philo->n % 2 == 0)
 		usleep(1500);
-	while (philo->data->are_alive)
+	while (philo->data->are_alive && !philo->data->full)
 	{
-		thinking(philo);
 		eating(philo);
 		sleeping(philo);
+		thinking(philo);
 	}
 	return (NULL);
-}
-
-int	meals_check(t_data *data)
-{
-	int	i;
-
-	i = 0;
-	while(data->meals && i < data->n_philo)
-	{
-		if (data->philo[i].n_eats == data->meals)
-			i++;
-		else
-			return (1);
-	}
-	return (0);
 }
 
 int	is_anybody_dead(t_data *data)
 {
 	int	i;
 
-	while (data->are_alive)
+	while (data->are_alive && !data->full)
 	{
 		i = 0;
 		while (i < data->n_philo)
 		{
-			if (((get_time() - data->time) - data->philo[i].last_eat ) > data->time_to_die)
+			pthread_mutex_lock(&data->death);
+			if (((get_time() - data->time) - data->philo[i].last_eat ) >= data->time_to_die)
 			{
 				print_action(&data->philo[i], 4);
 				data->are_alive = 0;
-				usleep(50);
+				// usleep(50);
 				return (1);
 			}
+			pthread_mutex_unlock(&data->death);
 			i++;
 		}
-		// if (!meals_check(data))
-		// 	break ;
+		i = 0;
+		while(data->meals && i < data->n_philo)
+		{
+			if (data->philo[i].n_eats >= data->meals)
+			{
+				if (i == (data->n_philo - 1))
+				{
+					data->full = 1;
+					return (1);
+				}
+			}
+			else
+				break ;
+			i++;
+		}
 	}
 	return (0);
 }
@@ -107,5 +107,6 @@ int	game(t_data *data)
 		pthread_join(phi[i], NULL);
 		i--;
 	}
+	free (phi);
 	return (0);
 }

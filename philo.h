@@ -6,7 +6,7 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 14:31:06 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/03 19:26:06 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/04 17:55:14 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,15 +39,17 @@ typedef struct	s_data
 	int	meals;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t write;
+	pthread_mutex_t death;
 	long long	time;
 	int	are_alive;
+	int full;
 	t_philo	*philo;
 }		t_data;
 
 int			init_data(char **argv, t_data *data);
 void		create_philos(t_data *data);
 long long	get_time(void);
-long		ft_usleep(int time);
+void		ft_usleep(int time);
 int			init_mutex(t_data *data);
 int			game(t_data *data);
 void		print_action(t_philo *philo, int n);
@@ -55,5 +57,6 @@ int			eating(t_philo *philo);
 int			thinking(t_philo *philo);
 int			sleeping(t_philo *philo);
 void		ft_clean(t_data *data);
+int			ft_atoi(const char *nptr);
 
 #endif
