@@ -6,32 +6,36 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 16:12:03 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/04 17:57:44 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/05 16:17:24 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	ft_clean(t_data *data)
+int	ft_clean(t_data *data)
 {
 	int	i;
 
 	i = 0;
 	while (i < data->n_philo)
 	{
-		pthread_mutex_destroy(&data->forks[i]);
+		if (&data->forks[i])
+			pthread_mutex_destroy(&data->forks[i]);
 		i++;
 	}
-    free (data->philo);
-    free (data->forks);
+	if (data->philo)
+		free (data->philo);
+	if (data->forks)
+		free (data->forks);
 	pthread_mutex_destroy(&data->write);
-    pthread_mutex_destroy(&data->death);
+	pthread_mutex_destroy(&data->death);
 	free(data);
+	return (1);
 }
 
-long long get_time(void)
+long long	get_time(void)
 {
-	struct timeval time;
+	struct timeval	time;
 
 	gettimeofday(&time, NULL);
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));

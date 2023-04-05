@@ -6,7 +6,7 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 18:25:07 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/05 13:48:51 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/05 16:26:53 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,25 @@ void	print_action(t_philo *philo, int n)
 	if (philo->data->are_alive && !philo->data->full)
 	{
 		if (n == 0)
-			printf("[%lld] %d is thinking\n", (get_time() - philo->data->time), philo->n);
+			printf("[%lld] %d is thinking\n",
+				(get_time() - philo->data->time), philo->n);
 		if (n == 1)
-			printf("[%lld] %d has taken a fork\n", (get_time() - philo->data->time), philo->n);
+			printf("[%lld] %d has taken a fork\n",
+				(get_time() - philo->data->time), philo->n);
 		if (n == 2)
-			printf("[%lld] %d is eating\n", (get_time() - philo->data->time), philo->n);
+			printf("[%lld] %d is eating\n",
+				(get_time() - philo->data->time), philo->n);
 		if (n == 3)
-			printf("[%lld] %d is sleeping\n", (get_time() - philo->data->time), philo->n);
+			printf("[%lld] %d is sleeping\n",
+				(get_time() - philo->data->time), philo->n);
 		if (n == 4)
-			printf("[%lld] %d is dead\n", (get_time() - philo->data->time), philo->n);
+			printf("[%lld] %d is dead\n",
+				(get_time() - philo->data->time), philo->n);
 	}
 	pthread_mutex_unlock(&philo->data->write);
 }
 
-void	*play(void *arg)
+static void	*play(void *arg)
 {
 	t_philo	*philo;
 
@@ -47,6 +52,28 @@ void	*play(void *arg)
 	return (NULL);
 }
 
+static int	check_meals(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (data->meals && data->are_alive && i < data->n_philo)
+	{
+		if (data->philo[i].n_eats >= data->meals)
+		{
+			if (i == (data->n_philo - 1))
+			{
+				data->full = 1;
+				return (1);
+			}
+		}
+		else
+			break ;
+		i++;
+	}
+	return (0);
+}
+
 int	is_anybody_dead(t_data *data)
 {
 	int	i;
@@ -57,31 +84,19 @@ int	is_anybody_dead(t_data *data)
 		while (i < data->n_philo)
 		{
 			pthread_mutex_lock(&data->death);
-			if (((get_time() - data->time) - data->philo[i].last_eat ) >= data->time_to_die)
+			if (((get_time() - data->time) - data->philo[i].last_eat)
+				>= data->time_to_die)
 			{
 				print_action(&data->philo[i], 4);
 				data->are_alive = 0;
-				// usleep(50);
+				pthread_mutex_unlock(&data->death);
 				return (1);
 			}
 			pthread_mutex_unlock(&data->death);
 			i++;
 		}
-		i = 0;
-		while(data->meals && i < data->n_philo)
-		{
-			if (data->philo[i].n_eats >= data->meals)
-			{
-				if (i == (data->n_philo - 1))
-				{
-					data->full = 1;
-					return (1);
-				}
-			}
-			else
-				break ;
-			i++;
-		}
+		if (check_meals(data))
+			return (1);
 	}
 	return (0);
 }
@@ -89,7 +104,7 @@ int	is_anybody_dead(t_data *data)
 int	game(t_data *data)
 {
 	pthread_t	*phi;
-	int	i;
+	int			i;
 
 	phi = (pthread_t *)malloc(sizeof(pthread_t) * data->n_philo);
 	if (!phi)
@@ -102,11 +117,13 @@ int	game(t_data *data)
 		i++;
 	}
 	is_anybody_dead(data);
-	while (i > 0)
+	while (--i >= 0)
 	{
 		if (pthread_join(phi[i], NULL))
+		{
+			printf("error\n");
 			return (1);
-		i--;
+		}
 	}
 	if (phi)
 		free (phi);

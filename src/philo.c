@@ -6,16 +6,16 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 14:28:45 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/05 13:48:38 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/05 16:27:35 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <string.h>
 
-int	init_mutex(t_data *data)
+static int	init_mutex(t_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->n_philo);
@@ -32,13 +32,13 @@ int	init_mutex(t_data *data)
 	return (0);
 }
 
-void	create_philos(t_data *data)
+static int	create_philos(t_data *data)
 {
-	int i;
+	int	i;
 
 	data->philo = malloc(sizeof(t_philo) * data->n_philo);
 	if (!data->philo)
-		return ;
+		return (1);
 	i = 0;
 	while (i < data->n_philo)
 	{
@@ -51,13 +51,11 @@ void	create_philos(t_data *data)
 		i++;
 	}
 	data->philo[i - 1].fork_left = 0;
+	return (0);
 }
 
-int	check_arg(char *str)
+static int	check_arg(char *str)
 {
-	// cambiar x ft_strcmp
-	// if (strcmp(str, "0") == 0)
-	// 	return (1);
 	while (*str)
 	{
 		if (*str < 48 || *str > 59)
@@ -67,15 +65,17 @@ int	check_arg(char *str)
 	return (0);
 }
 
-int	init_data(char **argv, t_data *data)
+static int	init_data(char **argv, t_data *data)
 {
-	if (check_arg(argv[1]) || check_arg(argv[2]) || check_arg(argv[3]) || check_arg(argv[4]))
+	if (check_arg(argv[1]) || check_arg(argv[2])
+		|| check_arg(argv[3]) || check_arg(argv[4]))
 		return (1);
 	data->n_philo = ft_atoi(argv[1]);
 	data->time_to_die = ft_atoi(argv[2]);
 	data->time_to_eat = ft_atoi(argv[3]);
 	data->time_to_sleep = ft_atoi(argv[4]);
-	if (data->n_philo <= 0 || data->time_to_die <= 0 || data->time_to_eat <= 0 || data->time_to_sleep <= 0)
+	if (data->n_philo <= 0 || data->time_to_die <= 0
+		|| data->time_to_eat <= 0 || data->time_to_sleep <= 0)
 		return (1);
 	data->are_alive = 1;
 	data->full = 0;
@@ -90,7 +90,7 @@ int	init_data(char **argv, t_data *data)
 	return (0);
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
 	t_data	*data;
 
@@ -107,12 +107,14 @@ int main(int argc, char *argv[])
 			free (data);
 			return (1);
 		}
-		init_mutex(data);	
-		create_philos(data);
+		if (init_mutex(data))
+			return (ft_clean(data));
+		if (create_philos(data))
+			return (ft_clean(data));
 		game(data);
-		ft_clean(data);
+		if (data)
+			ft_clean(data);
 	}
-	printf("f\n");
 	system("leaks philo");
 	return (0);
 }

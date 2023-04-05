@@ -6,7 +6,7 @@
 #    By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/05 13:38:33 by mrollo            #+#    #+#              #
-#    Updated: 2023/04/05 13:40:57 by mrollo           ###   ########.fr        #
+#    Updated: 2023/04/05 16:32:54 by mrollo           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,7 +42,7 @@ DEP	   			= $(addsuffix .d, $(basename $(OBJ)))
 
 COMPILE			= gcc -c
 LINK			= gcc
-CFLAGS			= -Wall -Werror -Wextra -MMD $(INC)
+CFLAGS			= -Wall -Werror -Wextra -MMD $(INC) -pthread
 LIBC			= ar -rcs
 RM_FILE			= rm -f
 RM_DIR			= rm -rf
@@ -62,7 +62,7 @@ all:			$(NAME)
 -include $(DEP) 
 $(NAME):		$(OBJ)
 				@$(LINK) $(OBJ) -o $(NAME)
-				@ECHO "Created push_swap (mandatory)"
+				@ECHO "Created philosophers (mandatory)"
 
 clean:
 				@$(RM_FILE) $(OBJ)

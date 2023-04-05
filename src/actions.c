@@ -6,13 +6,13 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 17:03:10 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/04 17:55:51 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/05 16:10:54 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int eating(t_philo *philo)
+int	eating(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->data->forks[philo->fork_left]);
 	print_action(philo, 1);
@@ -54,10 +54,8 @@ void	ft_usleep(int time)
 	long long	now;
 
 	now = get_time();
-	// while (time > (get_time() - now))
 	while (1)
 	{
-		// if (usleep(1) == -1)
 		if ((get_time() - now) >= time)
 			break ;
 		usleep(100);
