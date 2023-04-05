@@ -6,7 +6,7 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 14:28:45 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/04 17:58:17 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/05 13:48:38 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
 		game(data);
 		ft_clean(data);
 	}
-	system("leaks a.out");
+	printf("f\n");
+	system("leaks philo");
 	return (0);
 }

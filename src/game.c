@@ -6,7 +6,7 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/03 18:25:07 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/04 18:06:48 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/04/05 13:48:51 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,9 +104,11 @@ int	game(t_data *data)
 	is_anybody_dead(data);
 	while (i > 0)
 	{
-		pthread_join(phi[i], NULL);
+		if (pthread_join(phi[i], NULL))
+			return (1);
 		i--;
 	}
-	free (phi);
+	if (phi)
+		free (phi);
 	return (0);
 }
