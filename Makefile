@@ -6,7 +6,7 @@
 #    By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/05 13:38:33 by mrollo            #+#    #+#              #
-#    Updated: 2023/04/05 16:32:54 by mrollo           ###   ########.fr        #
+#    Updated: 2023/04/05 16:49:04 by mrollo           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,7 +42,7 @@ DEP	   			= $(addsuffix .d, $(basename $(OBJ)))
 
 COMPILE			= gcc -c
 LINK			= gcc
-CFLAGS			= -Wall -Werror -Wextra -MMD $(INC) -pthread
+CFLAGS			= -Wall -Werror -Wextra -pthread -MMD $(INC)
 LIBC			= ar -rcs
 RM_FILE			= rm -f
 RM_DIR			= rm -rf
@@ -60,7 +60,7 @@ $(OBJ_DIR)/%.o:$(SRC_DIR)/%.c
 all:			$(NAME)
 
 -include $(DEP) 
-$(NAME):		$(OBJ)
+$(NAME):		$(OBJ) Makefile
 				@$(LINK) $(OBJ) -o $(NAME)
 				@ECHO "Created philosophers (mandatory)"
 
