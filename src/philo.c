@@ -6,7 +6,7 @@
 /*   By: mrollo <mrollo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 14:28:45 by mrollo            #+#    #+#             */
-/*   Updated: 2023/04/05 16:27:35 by mrollo           ###   ########.fr       */
+/*   Updated: 2023/05/31 15:59:35 by mrollo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,10 @@ static int	init_data(char **argv, t_data *data)
 	data->full = 0;
 	data->time = get_time();
 	data->meals = 0;
-	if (argv[5] && !check_arg(argv[5]))
+	if (argv[5])
 	{
+		if (check_arg(argv[5]))
+			return (1);
 		data->meals = ft_atoi(argv[5]);
 		if (data->meals <= 0)
 			return (1);
